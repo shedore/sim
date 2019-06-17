@@ -1,0 +1,20 @@
+You can find information about this software from the link below.
+http://adsabs.harvard.edu/abs/2016BuSSA.106.1198F
+
+'################################################################################
+Author: Luis Sá
+Version: 1.00
+Date: March 1, 2016
+
+Description: This file "code" is a macro built in a Visual Basic For Applications module added to an Excel file named "simulador_nacional.xlsm" '   that contains several sheets
+--
+The first part - until line 85 - is a script to run the data that was inserted in a form, the program uses a progress bar to 
+sinalize how much time it takes to finish the run. The inputs required are the quake epicenter and related magnitude
+--
+The second part - from line 85 - is a continuous script that executes commands in Excel to perform the sevral steps required to have '   the quake simulation and the losses estimation.
+--
+'################################################################################
+
+Luis Sá
+luisfazendeiro@gmail.com
+
