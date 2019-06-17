@@ -1,0 +1,1132 @@
+'####################################################################################################################################
+'
+'   Author: Luis Sá
+'   Version: 1.00
+'   Date: March 1, 2016
+'
+'   Description: This tool is a macro built in a Visual Basic For Applications module added to an Excel file named "simulador_nacional.xlsm" 
+'   that contains several sheets
+'
+'   The first part - until line 85 - is a script to run the data that was inserted in a form, the program uses a progress bar to 
+'   sinalize how much time it takes to finish the run. The inputs required are the quake epicenter and related magnitude
+'
+'   The second part - from line 85 - is a continuous script that executes commands in Excel to perform the sevral steps required to have 
+'   the quake simulation and the losses estimation
+'
+'####################################################################################################################################
+
+Sub code()
+
+Dim i As Integer, pctcompl As Single
+
+    pctcompl = i
+    progress pctcompl
+
+UserForm1.Hide
+
+End Sub
+
+Sub progress(pctcompl As Single)
+
+UserForm1.Text.Caption = pctcompl & "% Completado"
+UserForm1.Bar.Width = pctcompl * 2
+DoEvents
+
+End Sub
+
+Sub UpdateProgressBar(PctDone As Single)
+    With UserForm1
+
+        ' Update the Caption property of the Frame control.
+        .FrameProgress.Caption = Format(PctDone, "0%")
+
+        ' Widen the Label control.
+        .LabelProgress.Width = PctDone * _
+            (.FrameProgress.Width - 10)
+    End With
+
+    ' The DoEvents allows the UserForm to update.
+    DoEvents
+End Sub
+
+Sub pre()
+ 
+ Sheets("folha1").Select
+ 
+With Application
+        .DecimalSeparator = "."
+        .UseSystemSeparators = False
+    End With
+
+ Simulador_Sismico.Hide
+  Call thyssen
+
+ 'Unload UserForm1
+Simulador_Sismico.Show
+ 
+End Sub
+
+Sub thyssen()
+   
+Application.DisplayAlerts = False
+
+Application.ScreenUpdating = True
+
+Call show_userform
+
+Application.ScreenUpdating = True
+ 
+End Sub
+
+Sub show_userform()
+
+UserForm1.Show
+
+End Sub
+
+Sub nut3()
+
+On Error Resume Next
+
+Dim PctDone As Single
+
+Application.DisplayAlerts = False
+
+PctDone = 0.1
+UpdateProgressBar PctDone
+    
+Windows("simulador_nacional.xlsm").Activate
+
+Worksheets("lisboa").Delete
+Worksheets.Add.Name = "lisboa"
+
+Worksheets("alentejo").Delete
+Worksheets.Add.Name = "alentejo"
+
+Worksheets("algarve").Delete
+Worksheets.Add.Name = "algarve"
+
+Worksheets("norte").Delete
+Worksheets.Add.Name = "norte"
+
+Worksheets("centro").Delete
+Worksheets.Add.Name = "centro"
+
+Worksheets("gis").Delete
+Worksheets.Add.Name = "gis"
+
+'ALENTEJO PROCESSING
+
+Windows("simulador_nacional.xlsm").Activate
+Sheets("folha1").Select
+
+Range("e10:e13").Select
+    Selection.Copy
+      
+   Workbooks.Open ("q:\al_andaluz\completados\simulador_alentejo.xlsb")
+   Sheets("portugal").Select
+   
+    Range("e10").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+      
+   Windows("simulador_nacional.xlsm").Activate
+Sheets("folha1").Select
+   
+   Range("e21:e23").Select
+    Selection.Copy
+      
+   Windows("simulador_alentejo.xlsb").Activate
+    Sheets("portugal").Select
+    
+     Range("b11").Select
+       Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+      
+Application.Wait (Now + TimeValue("0:00:05"))
+    
+Range("ey319:fl392").Select
+Selection.Copy
+
+Windows("simulador_nacional.xlsm").Activate
+Sheets("alentejo").Select
+Range("a2").Select
+
+ActiveSheet.Paste
+
+       Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+
+Columns("A:P").Select
+    Columns("A:P").EntireColumn.AutoFit
+    Selection.ColumnWidth = 50
+    Rows("4:62").Select
+    Selection.RowHeight = 20
+
+   Windows("simulador_alentejo.xlsb").Activate
+    Sheets("portugal").Select
+      
+   With ActiveSheet.ChartObjects.ShapeRange.Group
+   .CopyPicture Appearance:=xlScreen, Format:=xlPicture
+   .Ungroup
+   End With
+      
+ Windows("simulador_nacional.xlsm").Activate
+Sheets("alentejo").Select
+Range("a80").Select
+   
+ActiveSheet.Paste
+'bgri
+
+PctDone = 0.2
+UpdateProgressBar PctDone
+
+ Windows("simulador_alentejo.xlsb").Activate
+ 
+ Range("hn1:hx28905").Copy
+  Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("a2").Select
+  Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+ 
+ Windows("simulador_alentejo.xlsb").Activate
+ 
+ Range("x1:x28905").Copy
+  Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("l2").Select
+  Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+  
+ 'PGA
+ Windows("simulador_alentejo.xlsb").Activate
+ Range("hz1:hz28905").Copy
+ Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("m2").Select
+ Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+ 'fim PGA
+ 
+ Windows("simulador_alentejo.xlsb").Activate
+  ActiveWorkbook.Close False
+ 
+'FIM ALENTEJO PROCESSING
+       
+PctDone = 0.3
+UpdateProgressBar PctDone
+    
+'algarve PROCESSING
+
+Windows("simulador_nacional.xlsm").Activate
+Sheets("folha1").Select
+
+Range("e10:e13").Select
+    Selection.Copy
+      
+   Workbooks.Open ("q:\al_andaluz\completados\simulador_algarve.xlsb")
+   Sheets("portugal").Select
+   
+    Range("e10").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+      
+   Windows("simulador_nacional.xlsm").Activate
+Sheets("folha1").Select
+   
+    Range("e21:e23").Select
+    Selection.Copy
+      
+   Windows("simulador_algarve.xlsb").Activate
+    Sheets("portugal").Select
+    
+     Range("b11").Select
+       Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+      
+Application.Wait (Now + TimeValue("0:00:05"))
+    
+Range("de139:dr164").Select
+Selection.Copy
+
+Windows("simulador_nacional.xlsm").Activate
+Sheets("algarve").Select
+Range("a2").Select
+
+ActiveSheet.Paste
+
+       Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+
+Columns("A:P").Select
+    Columns("A:P").EntireColumn.AutoFit
+    Selection.ColumnWidth = 50
+    Rows("4:62").Select
+    Selection.RowHeight = 20
+
+   Windows("simulador_algarve.xlsb").Activate
+    Sheets("portugal").Select
+      
+   With ActiveSheet.ChartObjects.ShapeRange.Group
+   .CopyPicture Appearance:=xlScreen, Format:=xlPicture
+   .Ungroup
+   End With
+      
+ Windows("simulador_nacional.xlsm").Activate
+Sheets("algarve").Select
+Range("a50").Select
+   
+ActiveSheet.Paste
+
+'bgri
+ Windows("simulador_algarve.xlsb").Activate
+ 
+ Range("fv2:gg13712").Copy
+  Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("a28907").Select
+  Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+ 
+ Windows("simulador_algarve.xlsb").Activate
+ 
+ Range("x2:x13712").Copy
+  Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("l28907").Select
+  Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+  
+  'PGA
+Windows("simulador_algarve.xlsb").Activate
+ Range("gh2:gh13712").Copy
+ Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("m28907").Select
+ Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+ 'fim PGA
+  
+ Windows("simulador_algarve.xlsb").Activate
+  ActiveWorkbook.Close False
+ 
+'FIM algarve PROCESSING
+
+PctDone = 0.4
+UpdateProgressBar PctDone
+
+'lisboa PROCESSING
+
+Windows("simulador_nacional.xlsm").Activate
+Sheets("folha1").Select
+
+Range("e10:e13").Select
+    Selection.Copy
+      
+   Workbooks.Open ("q:\al_andaluz\completados\simulador_lisboa.xlsb")
+   Sheets("portugal").Select
+   
+    Range("e10").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+      
+   Windows("simulador_nacional.xlsm").Activate
+Sheets("folha1").Select
+   
+  Range("e21:e23").Select
+    Selection.Copy
+      
+   Windows("simulador_lisboa.xlsb").Activate
+    Sheets("portugal").Select
+    
+     Range("b11").Select
+       Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+      
+Application.Wait (Now + TimeValue("0:00:05"))
+    
+Range("ey319:fl340").Select
+Selection.Copy
+
+Windows("simulador_nacional.xlsm").Activate
+Sheets("lisboa").Select
+Range("a2").Select
+
+ActiveSheet.Paste
+
+       Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+
+Columns("A:P").Select
+    Columns("A:P").EntireColumn.AutoFit
+    Selection.ColumnWidth = 50
+    Rows("4:62").Select
+    Selection.RowHeight = 20
+
+   Windows("simulador_lisboa.xlsb").Activate
+    Sheets("portugal").Select
+      
+   With ActiveSheet.ChartObjects.ShapeRange.Group
+   .CopyPicture Appearance:=xlScreen, Format:=xlPicture
+   .Ungroup
+   End With
+      
+ Windows("simulador_nacional.xlsm").Activate
+Sheets("lisboa").Select
+Range("a50").Select
+   
+ActiveSheet.Paste
+ Windows("simulador_lisboa.xlsb").Activate
+ 
+ Range("hn2:hx34938").Copy
+  Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("a42618").Select
+  Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+ 
+ Windows("simulador_lisboa.xlsb").Activate
+ 
+ Range("x2:x34938").Copy
+  Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("l42618").Select
+  Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+  
+  Columns("B:B").Select
+    Selection.NumberFormat = "0.0"
+    Columns("C:K").Select
+    Selection.NumberFormat = "0"
+    Columns("L:L").EntireColumn.AutoFit
+        Columns("L:L").Select
+  Selection.NumberFormat = "@"
+  
+    'PGA
+Windows("simulador_lisboa.xlsb").Activate
+ Range("hz2:hz34938").Copy
+ Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("m42618").Select
+ Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+ 'fim PGA
+      
+     Windows("simulador_lisboa.xlsb").Activate
+  ActiveWorkbook.Close False
+  
+   'FIM lisboa PROCESSING
+    
+PctDone = 0.5
+UpdateProgressBar PctDone
+     
+     'norte PROCESSING
+
+Windows("simulador_nacional.xlsm").Activate
+Sheets("folha1").Select
+
+Range("e10:e13").Select
+    Selection.Copy
+      
+   Workbooks.Open ("q:\al_andaluz\completados\simulador_norte.xlsb")
+   Sheets("portugal").Select
+   
+    Range("e10").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+      
+   Windows("simulador_nacional.xlsm").Activate
+Sheets("folha1").Select
+   
+   Range("e21:e23").Select
+    Selection.Copy
+      
+   Windows("simulador_norte.xlsb").Activate
+    Sheets("portugal").Select
+    
+     Range("b11").Select
+       Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+      
+Application.Wait (Now + TimeValue("0:00:05"))
+    
+Windows("simulador_norte.xlsb").Activate
+Sheets("portugal").Select
+Range("gn474:ha586").Select
+Selection.Copy
+
+Windows("simulador_nacional.xlsm").Activate
+Sheets("norte").Select
+Range("a2").Select
+
+ActiveSheet.Paste
+
+       Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+
+Columns("A:P").Select
+    Columns("A:P").EntireColumn.AutoFit
+    Selection.ColumnWidth = 50
+    Rows("4:62").Select
+    Selection.RowHeight = 20
+
+   Windows("simulador_norte.xlsb").Activate
+    Sheets("portugal").Select
+      
+   With ActiveSheet.ChartObjects.ShapeRange.Group
+   .CopyPicture Appearance:=xlScreen, Format:=xlPicture
+   .Ungroup
+   End With
+      
+ Windows("simulador_nacional.xlsm").Activate
+Sheets("norte").Select
+Range("a115").Select
+   
+ActiveSheet.Paste
+ Windows("simulador_norte.xlsb").Activate
+ 
+ Range("jc2:jn88229").Copy
+  Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("a77555").Select
+  Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+ 
+ Windows("simulador_norte.xlsb").Activate
+ 
+ Range("x2:x88229").Copy
+  Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("l77555").Select
+  Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+  
+  Columns("B:B").Select
+    Selection.NumberFormat = "0.0"
+    Columns("C:K").Select
+    Selection.NumberFormat = "0"
+    Columns("L:L").EntireColumn.AutoFit
+        Columns("L:L").Select
+  Selection.NumberFormat = "@"
+  
+     'PGA
+Windows("simulador_norte.xlsb").Activate
+ Range("jo2:jo88229").Copy
+ Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("m77555").Select
+ Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+ 'fim PGA
+  
+     Windows("simulador_norte.xlsb").Activate
+  ActiveWorkbook.Close False
+  
+   'FIM norte PROCESSING
+
+  PctDone = 0.6
+  UpdateProgressBar PctDone
+
+      'centro PROCESSING
+
+Windows("simulador_nacional.xlsm").Activate
+Sheets("folha1").Select
+
+Range("e10:e13").Select
+    Selection.Copy
+      
+   Workbooks.Open ("q:\al_andaluz\completados\simulador_centro.xlsb")
+   Sheets("portugal").Select
+   
+    Range("e10").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+      
+   Windows("simulador_nacional.xlsm").Activate
+Sheets("folha1").Select
+   
+    Range("e21:e23").Select
+    Selection.Copy
+      
+   Windows("simulador_centro.xlsb").Activate
+    Sheets("portugal").Select
+    
+     Range("b11").Select
+       Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+      
+Application.Wait (Now + TimeValue("0:00:05"))
+    
+Range("gn474:ha586").Select
+Selection.Copy
+
+Windows("simulador_nacional.xlsm").Activate
+Sheets("centro").Select
+Range("a2").Select
+
+ActiveSheet.Paste
+
+       Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+
+Columns("A:P").Select
+    Columns("A:P").EntireColumn.AutoFit
+    Selection.ColumnWidth = 50
+    Rows("4:62").Select
+    Selection.RowHeight = 20
+
+   Windows("simulador_centro.xlsb").Activate
+    Sheets("portugal").Select
+      
+   With ActiveSheet.ChartObjects.ShapeRange.Group
+   .CopyPicture Appearance:=xlScreen, Format:=xlPicture
+   .Ungroup
+   End With
+      
+ Windows("simulador_nacional.xlsm").Activate
+Sheets("centro").Select
+Range("a118").Select
+   
+ActiveSheet.Paste
+
+ Windows("simulador_centro.xlsb").Activate
+ 
+ Range("jc2:jn90065").Copy
+  Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("a165783").Select
+  Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+ 
+ Windows("simulador_centro.xlsb").Activate
+ 
+ Range("x2:x90065").Copy
+  Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("l165783").Select
+  Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+  
+     Rows("1:1").Select
+    Selection.Delete Shift:=xlUp
+  
+  Columns("B:B").Select
+    Selection.NumberFormat = "0.0"
+    Columns("C:K").Select
+    Selection.NumberFormat = "0"
+    Columns("L:L").EntireColumn.AutoFit
+        Columns("L:L").Select
+  Selection.NumberFormat = "@"
+  
+ '    Range("L1").Select
+ '   ActiveCell.FormulaR1C1 = "subseccao"
+ 
+      'PGA
+Windows("simulador_centro.xlsb").Activate
+ Range("jo2:jo90065").Copy
+ Windows("simulador_nacional.xlsm").Activate
+ Sheets("gis").Select
+ Range("m165782").Select
+ Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+ 'fim PGA
+   
+     Windows("simulador_centro.xlsb").Activate
+  ActiveWorkbook.Close False
+  
+   'FIM centro PROCESSING
+     
+PctDone = 0.7
+UpdateProgressBar PctDone
+          
+'fim da bgri e da exportacao para excel + arcgis
+       Windows("simulador_nacional.xlsm").Activate
+     Sheets("gis").Select
+       
+       Columns("L:L").Select
+    ActiveWorkbook.Worksheets("gis").Sort.SortFields.Clear
+    ActiveWorkbook.Worksheets("gis").Sort.SortFields.Add Key:=Range("L1"), _
+        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    With ActiveWorkbook.Worksheets("gis").Sort
+        .SetRange Range("A2:M255845")
+        .Header = xlNo
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+                   
+ Sheets("folha1").Select
+ Range("n1:n255845").Copy
+ 
+  Sheets("gis").Select
+ Range("a1").Select
+       Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+ 
+ Call nD_erro  'limpa os erros #N/D
+  
+  Columns("H:H").Select
+  
+    Selection.NumberFormat = "0"
+     
+     ActiveWorkbook.Save
+ 
+Call Foo
+
+PctDone = 0.8
+UpdateProgressBar PctDone
+
+Call Foo1
+     
+PctDone = 0.9
+UpdateProgressBar PctDone
+
+Call Foo2
+        
+PctDone = 1
+UpdateProgressBar PctDone
+
+Unload UserForm1
+  
+  Dim Retval
+Retval = Shell("q:\al_andaluz\tada.wav", vbMinimizedFocus)
+'Retval = Shell("q:\al_andaluz\mplayer2.exe q:\al_andaluz\tada.wav", vbMinimizedFocus)
+Application.Wait Now() + TimeSerial(0, 0, 1)
+Shell ("taskkill /F /IM mplayer2.exe")
+  
+    sig1.Show
+    
+ '   sig1.ShowModal = False
+      
+End Sub
+
+Sub Foo()
+
+      On Error Resume Next
+    
+    Kill "q:\al_andaluz\completados\gis_sim.txt"
+      Kill "q:\al_andaluz\completados\gis_sim.csv"
+   Sheets("gis").Select
+   
+    Cells.Select
+    Selection.Copy
+    Workbooks.Add
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+        Application.CutCopyMode = False
+            ActiveWorkbook.SaveAs FileName:="Q:\al_andaluz\completados\gis_sim.txt", _
+        FileFormat:=xlText, CreateBackup:=False
+    ActiveWindow.Close
+ 
+  Sheets("gis").Select
+  
+    Cells.Select
+    Selection.Copy
+    Workbooks.Add
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+        Application.CutCopyMode = False
+            ActiveWorkbook.SaveAs FileName:="Q:\al_andaluz\completados\gis_sim.csv", FileFormat:=xlCSV, CreateBackup:=False
+    ActiveWindow.Close
+ 
+End Sub
+
+Sub Foo1()
+  
+     On Error Resume Next
+    Kill "q:\al_andaluz\completados\epicentro.txt"
+        Sheets("aux").Select
+      
+ Cells.Select
+    Selection.Copy
+    Workbooks.Add
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+        Application.CutCopyMode = False
+    ActiveWorkbook.SaveAs FileName:="Q:\al_andaluz\completados\epicentro.txt", _
+        FileFormat:=xlText, CreateBackup:=False
+    ActiveWindow.Close
+   
+End Sub
+
+Sub Foo2()
+     On Error Resume Next
+    Kill "q:\al_andaluz\out\resultados.xls"
+    Kill "q:\al_andaluz\out\report.pdf"
+   
+   Sheets(Array("centro", "norte", "algarve", "alentejo", "lisboa", "nacional")).Select
+   Sheets(Array("centro", "norte", "algarve", "alentejo", "lisboa", "nacional")).Copy
+ ActiveWorkbook.SaveAs "Q:\al_andaluz\out\resultados.xls", FileFormat:=56
+            
+           Sheets("centro").Select
+    
+    Range("A4:M4").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 65535
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+    
+    Sheets("norte").Select
+   
+    Range("A4:M4").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 65535
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+    
+    Sheets("lisboa").Select
+  
+    Range("A4:M4").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 65535
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+           
+           Sheets("centro").Select
+    Range("A2").Select
+    ActiveCell.FormulaR1C1 = "CENTRO"
+    
+    Sheets("norte").Select
+        Range("A2").Select
+    ActiveCell.FormulaR1C1 = "NORTE"
+    
+        Sheets("algarve").Select
+            Range("A2").Select
+    ActiveCell.FormulaR1C1 = "ALGARVE"
+
+    Sheets("alentejo").Select
+    Range("A2").Select
+    ActiveCell.FormulaR1C1 = "ALENTEJO"
+   
+    Sheets("lisboa").Select
+    Range("A2").Select
+    ActiveCell.FormulaR1C1 = "LISBOA"
+    Range("A23").Select
+ 
+       Sheets("norte").Select
+    
+    Range("A5:M90").Select
+    Selection.Copy
+    Sheets("nacional").Select
+    Range("B5").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    
+    Range("B91").Select
+    Sheets("centro").Select
+    
+    Range("A5:M104").Select
+    Range("M104").Activate
+    Application.CutCopyMode = False
+    Selection.Copy
+    Sheets("nacional").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+ 
+    Range("B191").Select
+    Sheets("lisboa").Select
+    Range("A5:M22").Select
+    Application.CutCopyMode = False
+    Selection.Copy
+    Sheets("nacional").Select
+    Range("B191").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Range("B209").Select
+    Sheets("alentejo").Select
+    Range("A5:M62").Select
+    Application.CutCopyMode = False
+    Selection.Copy
+    Sheets("nacional").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+  
+    Range("B267").Select
+    Sheets("algarve").Select
+    Range("A3:M18").Select
+    Application.CutCopyMode = False
+    Selection.Copy
+    Sheets("nacional").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+  
+    Application.CutCopyMode = False
+ 
+  Dim ws As Worksheet
+  For Each ws In Worksheets
+  ws.Select
+  ActiveWindow.Zoom = 50
+  Next ws
+      
+    Sheets("nacional").Select
+    
+    Range("I5:L282").Select
+    Selection.Copy
+    
+    Workbooks.Open "q:\al_andaluz\out\financas.xls"
+    Range("h2:k279").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Range("a2").Select
+  ActiveWindow.Zoom = 50
+    ActiveWorkbook.Close True
+ 
+   Windows("resultados.xls").Activate
+    Sheets("nacional").Select
+        
+   ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, FileName:= _
+        "Q:\al_andaluz\out\report.pdf", Quality:=xlQualityStandard, _
+        IncludeDocProperties:=True, IgnorePrintAreas:=False, OpenAfterPublish:= _
+        False
+        
+Windows("resultados.xls").Activate
+    
+  ActiveWorkbook.Close True
+
+Windows("simulador_nacional.xlsm").Activate
+  
+End Sub
+
+Sub outra()
+    
+    Workbooks.Add
+       Range("a1").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+  
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+        
+        ActiveWorkbook.SaveAs FileName:="Q:\al_andaluz\int.xls", _
+        FileFormat:=xlExcel8, Password:="", WriteResPassword:="", _
+        ReadOnlyRecommended:=False, CreateBackup:=False
+
+    ActiveWorkbook.Close
+
+Windows("simulador_nacional.xlsm").Activate
+Sheets("folha0").Select
+
+  With ActiveSheet.PageSetup
+     .Zoom = False
+     .FitToPagesWide = 1
+     .FitToPagesTall = 1
+End With
+
+Sheets("folha0").Range("B98:p130").ExportAsFixedFormat Type:=xlTypePDF, FileName:= _
+    "Q:\al_andaluz\tabela1.pdf", Quality:= _
+    xlQualityStandard, IncludeDocProperties:=True, IgnorePrintAreas:=False, _
+    OpenAfterPublish:=False
+
+Sheets("folha0").Select
+ 
+ Range("B100:n130").Select
+    Selection.Copy
+    Workbooks.Add
+    ActiveSheet.Paste
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+  
+    Application.CutCopyMode = False
+    ChDir "Q:\al_andaluz"
+      
+        ActiveWorkbook.SaveAs FileName:="Q:\al_andaluz\concelhos.xls", _
+        FileFormat:=xlExcel8, Password:="", WriteResPassword:="", _
+        ReadOnlyRecommended:=False, CreateBackup:=False
+        
+          Rows("1:3").Select
+    Selection.Delete Shift:=xlUp
+    Rows("18:27").Select
+    Selection.Delete Shift:=xlUp
+    ActiveWorkbook.Save
+     
+       ActiveWorkbook.Close
+  Application.CutCopyMode = False
+Application.DisplayAlerts = False
+
+Windows("simulador_nacional.xlsm").Activate
+Sheets("portugal").Select
+
+Range("fy1:gi13712").Select
+    Selection.Copy
+   
+    Workbooks.Add
+       Range("a1").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+   
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+        
+        ActiveWorkbook.SaveAs FileName:="Q:\al_andaluz\bgri.xls", _
+        FileFormat:=xlExcel8, Password:="", WriteResPassword:="", _
+        ReadOnlyRecommended:=False, CreateBackup:=False
+   
+    Application.CutCopyMode = False
+    
+       ActiveWorkbook.Close
+
+Windows("simulador_nacional.xlsm").Activate
+Sheets("aux").Select
+Range("a1:c2").Select
+    Selection.Copy
+   
+    Workbooks.Add
+       Range("a1").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+   
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+        
+        ActiveWorkbook.SaveAs FileName:="Q:\al_andaluz\epicentro.xls", _
+        FileFormat:=xlExcel8, Password:="", WriteResPassword:="", _
+        ReadOnlyRecommended:=False, CreateBackup:=False
+
+   Application.CutCopyMode = False
+
+       ActiveWorkbook.Close
+       
+   Windows("simulador_nacional.xlsm").Activate
+   Sheets("portugal").Select
+       
+ Application.DisplayAlerts = True
+Unload UserForm1
+sig1.Show
+       
+End Sub
+
+Sub chamar_bat()
+
+Dim Retval
+
+Retval = Shell("Q:\al_andaluz\menu.bat")
+Application.Wait Now + TimeValue("00:00:15")
+
+Unload UserForm2
+
+End Sub
+
+Sub format_pdf()
+
+Range("F1:F17").Select
+    Selection.Cut Destination:=Range("I1:I17")
+    Range("G1:I20").Select
+    Selection.Cut Destination:=Range("F1:H20")
+    Range("F1:H20").Select
+    Columns("H:H").ColumnWidth = 6.43
+    Columns("G:G").ColumnWidth = 5.86
+    Range("A20:G20").Select
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlBottom
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    Range("E25").Select
+
+End Sub
+
+Sub nulos()
+
+Sheets("Folha3").Select
+Range("a1:k100").Select
+Call limpeza
+
+Sheets("Folha2").Select
+Range("a1:k100").Select
+Call limpeza
+
+Sheets("Folha1").Select
+Range("a1:k100").Select
+Call limpeza
+
+Sheets("Folha3").Select
+Range("a1").Select
+
+End Sub
+
+Sub limpeza()
+
+Dim cel As Range
+For Each cel In Selection
+If IsError(cel.Value) Then
+If cel.Value = CVErr(xlErrDiv0) Then cel.Value = "Sem Baixas"
+End If
+
+Next cel
+    
+End Sub
+
+Sub kTest()
+    
+    Application.DisplayAlerts = False
+  
+    Dim Sht     As Worksheet
+    
+    Set Sht = Worksheets("folha1")
+    
+    Sht.Copy
+  ActiveWorkbook.SaveAs FileName:="q:\al_andaluz\xy.xls", FileFormat:=xlExcel7 _
+        , Password:="", WriteResPassword:="", ReadOnlyRecommended:=False, _
+        CreateBackup:=False
+    ActiveWorkbook.Close 0
+        Application.DisplayAlerts = True
+        
+End Sub
+
+Sub nD_erro()
+
+Sheets("gis").Select
+
+    Range("N2").Select
+    ActiveCell.FormulaR1C1 = "=IF(ISNA(RC[-11]),0,RC[-11])"
+      
+    Range("n2").Select
+    Selection.AutoFill Destination:=Range("N2:v2"), Type:=xlFillDefault
+    Range("n2:v2").Select
+    Selection.Cut Destination:=Range("n2:v2")
+      
+    Range("n2:v2").Select
+    Selection.AutoFill Destination:=Range("n2:v255843")
+    Range("n2:v255843").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("n2:v255843").Cut Destination:=Range("C2:K255843")
+   
+   End Sub
+
+Sub donereport()
+
+Workbooks.Open FileName:="Q:\al_andaluz\out\resultados.xls", ReadOnly:=True
+Sheets("nacional").Select
+
+    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, FileName:= _
+        "Q:\al_andaluz\out\report.pdf", Quality:=xlQualityStandard, _
+        IncludeDocProperties:=True, IgnorePrintAreas:=False, OpenAfterPublish:= _
+        True
+        
+Windows("resultados.xls").Activate
+ActiveWorkbook.Close False
+
+End Sub
+
+
+
